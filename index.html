@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Maze Ball — W A S D Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- ══════════════ HEADER ══════════════ -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <h1 class="brand-title">MAZE&nbsp;BALL</h1>
+      </div>
+
+      <div class="topbar-center">
+        <div class="level-indicator" id="levelIndicator">LEVEL 1 / 10</div>
+        <div class="progress-track" title="Overall progress">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="stat-pill" title="Time">
+          <span class="stat-icon">⏱</span><span id="timeDisplay">00:00.00</span>
+        </div>
+        <div class="stat-pill" title="Attempts">
+          <span class="stat-icon">↺</span><span id="attemptsDisplay">0</span>
+        </div>
+        <button class="icon-btn" id="btnSound" title="Sound on/off">🔊</button>
+        <button class="icon-btn" id="btnMenu" title="Main menu">☰</button>
+      </div>
+    </header>
+
+    <!-- ══════════════ MAIN LAYOUT ══════════════ -->
+    <main class="layout">
+      <!-- Hint panel (left) -->
+      <aside class="hint-panel" id="hintPanel">
+        <div class="hint-head">
+          <span class="hint-bulb">💡</span>
+          <span class="hint-title">HINT</span>
+        </div>
+        <p class="hint-text" id="hintText">Press W, A, S or D to move the ball.</p>
+        <p class="hint-sub" id="hintSub"></p>
+
+        <div class="controls-card">
+          <div class="controls-title">CONTROLS</div>
+          <div class="wasd-diagram">
+            <div class="key key-w"><kbd>W</kbd><span>↑</span></div>
+            <div class="wasd-row">
+              <div class="key key-a"><kbd>A</kbd><span>←</span></div>
+              <div class="wasd-ball">●</div>
+              <div class="key key-d"><kbd>D</kbd><span>→</span></div>
+            </div>
+            <div class="key key-s"><kbd>S</kbd><span>↓</span></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Game area (center) -->
+      <section class="stage">
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas id="gameCanvas"></canvas>
+          <div class="canvas-shade" id="canvasShade"></div>
+        </div>
+
+        <div class="demo-bar" id="demoBar">
+          <span class="demo-label">DEMO MODE</span>
+          <button class="btn btn-ghost" id="btnDemoStart" title="Autoplay the solution">▶ Start Demo</button>
+          <button class="btn btn-ghost" id="btnDemoPause" title="Pause demo" disabled>⏸ Pause</button>
+          <button class="btn btn-ghost" id="btnDemoStop" title="Stop demo and take control" disabled>⏹ Stop</button>
+          <button class="btn btn-ghost" id="btnSolution" title="Show the solution path">🛣 Solution</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Touch D-pad (small screens only) -->
+    <div class="dpad" id="dpad" aria-hidden="true">
+      <button class="dpad-btn dpad-up" data-dir="up">▲</button>
+      <button class="dpad-btn dpad-left" data-dir="left">◀</button>
+      <button class="dpad-btn dpad-down" data-dir="down">▼</button>
+      <button class="dpad-btn dpad-right" data-dir="right">▶</button>
+    </div>
+
+    <!-- ══════════════ OVERLAYS ══════════════ -->
+    <div class="overlay" id="startScreen">
+      <div class="modal modal-center">
+        <div class="modal-glow"></div>
+        <p class="eyebrow">W A S D &nbsp;CHALLENGE</p>
+        <h2 class="modal-title huge">MAZE BALL</h2>
+        <p class="tagline">Reach the <span class="accent-goal">goal</span> without touching the walls.</p>
+
+        <div class="mini-wasd">
+          <div class="key key-w"><kbd>W</kbd><span>↑</span></div>
+          <div class="wasd-row">
+            <div class="key key-a"><kbd>A</kbd><span>←</span></div>
+            <div class="wasd-ball">●</div>
+            <div class="key key-d"><kbd>D</kbd><span>→</span></div>
+          </div>
+          <div class="key key-s"><kbd>S</kbd><span>↓</span></div>
+        </div>
+        <p class="muted">Move the ball with your keyboard</p>
+
+        <div class="modal-actions">
+          <button class="btn btn-primary btn-big" id="btnStart">▶ START GAME</button>
+        </div>
+        <div class="modal-links">
+          <button class="link-btn" data-screen="howto">ℹ How to Play</button>
+          <button class="link-btn" data-screen="levels">🎮 Levels</button>
+          <button class="link-btn" data-screen="settings">⚙ Settings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tutorial / interactive demo -->
+    <div class="overlay hidden" id="tutorialScreen">
+      <div class="modal modal-center">
+        <p class="eyebrow">INTERACTIVE TUTORIAL</p>
+        <h2 class="modal-title">Watch how it moves</h2>
+
+        <div class="tutorial-track" id="tutorialTrack">
+          <span class="tut-goal">🎯</span>
+          <span class="tut-ball" id="tutBall">●</span>
+          <span class="tut-key tut-key-d">D</span>
+          <span class="tut-key tut-key-s">S</span>
+          <span class="tut-key tut-key-d2">D</span>
+          <span class="tut-key tut-key-w">W</span>
+          <span class="tut-key tut-key-a">A</span>
+        </div>
+
+        <p class="muted">
+          <kbd>W</kbd> up &nbsp;·&nbsp; <kbd>A</kbd> left &nbsp;·&nbsp;
+          <kbd>S</kbd> down &nbsp;·&nbsp; <kbd>D</kbd> right
+        </p>
+        <p class="muted">Touch a wall = failed attempt. Reach 🎯 to win.</p>
+
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="btnTutorialStart">GOT IT — START LEVEL 1</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main menu -->
+    <div class="overlay hidden" id="menuScreen">
+      <div class="modal">
+        <h2 class="modal-title">MAIN MENU</h2>
+        <div class="menu-list">
+          <button class="menu-item" id="menuResume"><span>▶</span> Resume</button>
+          <button class="menu-item" id="menuRestart"><span>↻</span> Restart Level</button>
+          <button class="menu-item" data-screen="levels"><span>🎮</span> Select Level</button>
+          <button class="menu-item" id="menuDemo"><span>🤖</span> Demo Mode</button>
+          <button class="menu-item" data-screen="settings"><span>⚙</span> Settings</button>
+          <button class="menu-item" data-screen="howto"><span>ℹ</span> How to Play</button>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="menuClose">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Level select -->
+    <div class="overlay hidden" id="levelsScreen">
+      <div class="modal">
+        <h2 class="modal-title">SELECT LEVEL</h2>
+        <div class="level-grid" id="levelGrid"></div>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="levelsClose">Back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="overlay hidden" id="settingsScreen">
+      <div class="modal">
+        <h2 class="modal-title">SETTINGS</h2>
+        <div class="setting-row">
+          <span>Sound</span>
+          <button class="switch" id="settingSound" role="switch" aria-checked="true"><span></span></button>
+        </div>
+        <div class="setting-row">
+          <span>Hints</span>
+          <button class="switch" id="settingHints" role="switch" aria-checked="true"><span></span></button>
+        </div>
+        <div class="setting-row">
+          <span>Demo Speed</span>
+          <div class="segmented" id="settingSpeed">
+            <button data-speed="slow">Slow</button>
+            <button data-speed="normal" class="active">Normal</button>
+            <button data-speed="fast">Fast</button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="settingsReset">Reset Progress</button>
+          <button class="btn btn-ghost" id="settingsClose">Back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to play -->
+    <div class="overlay hidden" id="howtoScreen">
+      <div class="modal">
+        <h2 class="modal-title">HOW TO PLAY</h2>
+        <p class="howto-line">Your objective is to <strong>reach the goal</strong>.</p>
+        <p class="howto-line">Move the ball using:</p>
+        <div class="mini-wasd">
+          <div class="key key-w"><kbd>W</kbd><span>↑</span></div>
+          <div class="wasd-row">
+            <div class="key key-a"><kbd>A</kbd><span>←</span></div>
+            <div class="wasd-ball">●</div>
+            <div class="key key-d"><kbd>D</kbd><span>→</span></div>
+          </div>
+          <div class="key key-s"><kbd>S</kbd><span>↓</span></div>
+        </div>
+        <p class="howto-line">❌ Avoid touching the walls — they fail your attempt.</p>
+        <p class="howto-line">🎯 Reach the goal to complete the level.</p>
+        <p class="howto-line">🤖 Use <em>Demo Mode</em> to watch the solution.</p>
+        <p class="howto-line">Good luck!</p>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="howtoClose">Back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Level complete -->
+    <div class="overlay hidden" id="successScreen">
+      <div class="modal modal-center">
+        <div class="success-check">✓</div>
+        <h2 class="modal-title">LEVEL COMPLETE!</h2>
+        <div class="success-stats">
+          <div class="success-stat"><span class="label">Time</span><span class="value" id="successTime">0.0s</span></div>
+          <div class="success-stat"><span class="label">Attempts</span><span class="value" id="successAttempts">0</span></div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="btnNext">NEXT LEVEL →</button>
+          <button class="btn btn-ghost" id="btnShowSolution">🛣 Show Solution</button>
+          <button class="btn btn-ghost" id="btnSuccessMenu">MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Failed -->
+    <div class="overlay hidden" id="failScreen">
+      <div class="modal modal-center">
+        <div class="fail-cross">✕</div>
+        <h2 class="modal-title danger-text">LEVEL FAILED</h2>
+        <p class="muted">You touched the wall.<br />Don't worry — try again.</p>
+        <p class="fail-hint" id="failHint">💡 Try approaching the next turn more carefully.</p>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="btnRetry">↻ RETRY</button>
+          <button class="btn btn-ghost" id="btnFailMenu">MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game complete -->
+    <div class="overlay hidden" id="completeScreen">
+      <div class="modal modal-center">
+        <div class="complete-emoji">🎉</div>
+        <h2 class="modal-title huge">COMPLETE!</h2>
+        <p class="tagline">YOU BEAT ALL 10 LEVELS</p>
+        <div class="success-stats">
+          <div class="success-stat"><span class="label">Total Time</span><span class="value" id="completeTime">0:00</span></div>
+          <div class="success-stat"><span class="label">Total Attempts</span><span class="value" id="completeAttempts">0</span></div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="btnPlayAgain">↻ PLAY AGAIN</button>
+          <button class="btn btn-ghost" id="btnCompleteMenu">MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/collision.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/hints.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
