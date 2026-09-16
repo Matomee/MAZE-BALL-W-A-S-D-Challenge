@@ -11,6 +11,16 @@ JavaScript (Canvas)**. No engines. No libraries. No build step. Open
 ![Tech](https://img.shields.io/badge/tech-vanilla%20JS%20%2B%20Canvas-blue)
 ![Deps](https://img.shields.io/badge/dependencies-none-orange)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
+![Live](https://img.shields.io/badge/live-GitHub%20Pages-success)
+
+---
+
+## ▶ Play the live game
+
+> **🎮 [PLAY MAZE BALL NOW](https://matomee.github.io/MAZE-BALL-W-A-S-D-Challenge/)**
+>
+> Deployed on **GitHub Pages** straight from this repo's `main` branch — open in
+> any browser, no install needed. The link rebuilds automatically on every push.
 
 ---
 
